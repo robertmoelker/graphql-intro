@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "compile": "tsc",
-    "start": "pnpm run compile && node ./dist/index.js"
+    "watch": "tsc -w",
+    "build": "tsc",
+    "start": "pnpm run watch & node --watch --trace-warnings ./dist/index.js"
   },
   "keywords": [],
   "author": "Robert Moelker <@robertmoelker>",
@@ -14,11 +15,14 @@
   "packageManager": "pnpm@10.7.1",
   "dependencies": {
     "@apollo/server": "^4.11.3",
-    "graphql": "^16.10.0"
+    "graphql": "^16.10.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.6.0",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.17",
+    "nodemon": "^3.1.9",
     "typescript": "^5.8.2"
   }
 }

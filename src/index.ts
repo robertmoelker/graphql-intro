@@ -1,6 +1,7 @@
 import { ApolloServer } from '@apollo/server'
 import { startStandaloneServer } from '@apollo/server/standalone'
 import { faker } from '@faker-js/faker'
+import shuffle from 'lodash/shuffle.js'
 
 // NOTE: Define the type (e.g. User, Profile, UserSettings) and the type `Query` is reserved.
 const typeDefs = `#graphql
@@ -9,53 +10,69 @@ const typeDefs = `#graphql
     middleName: String
     lastName: String
     emailAddress: String
+    products: [Product]
   }
 
-  type Order {
-    id: Number
+  type Product {
+    id: String
     description: String
-    price: Number
-    createdAt: Number // NOTE: will be stored as unixtimestamp
+    price: Float
+    createdAt: Int
   }
 
   type Query {
     users: [User]
   }
 `
+type User = {
+  firstName: String
+  middleName: String
+  lastName: String
+  emailAddress: String
+  products?: Product[]
+}
 
-type Products = {
-  name: String
-  description: String
+type Product = {
+  id: string
+  name: string
+  description: string
   price: Number
 }
 
-const products: Products = []
+const products: Product[] = []
 
 for (let i = 0; i < 100; i++) {
   products.push({
+    id: faker.commerce.isbn(),
     name: faker.commerce.productName(),
     description: faker.commerce.productDescription(),
-    price: faker.commerce.price()
+    price: parseFloat(faker.commerce.price())
   })
 }
 
 // NOTE: Use faker to generate users.
-const users = []
+const users: User[] = []
+
 for (let i = 0; i < 100; i++) {
   // NOTE: setup orders per user
-  const orders = []
-  users.push({
-    firstName: faker.person.firstName(),
-    middleName: (i % 3 === 0) ? faker.person.middleName() : '',
-    lastName: faker.person.lastName(),
-    emailAddress: faker.internet.email().toLowerCase(),
-  })
-
-  for (let x = 0; x < 5; i++) {
-    console.log('x', x)
+  const product: Product = null
+  const user: User = {
+    firstName : faker.person.firstName(),
+    middleName : (i % 3 === 0) ? faker.person.middleName() : '',
+    lastName : faker.person.lastName(),
+    emailAddress : faker.internet.email().toLowerCase(),
+    products: [],
   }
 
-  // NOTE: use faker to generate fake order items as well
+  const amountProducts = Math.floor(Math.random() * 10)
+
+  for (let p = 0; p < amountProducts; p++) {
+    const userProducts = shuffle(products)
+    console.log('userProducts', userProducts)
+    user.products.push(userProducts[p])
+  }
+
+  users.push(user)
 }
 
 // Setup a resolver - so that ApolloServer knows which list to return on what certain query
@@ -79,7 +96,7 @@ const resolvers = {
 }
 
 const server = new ApolloServer({
-  typeDefs, 
+  typeDefs,
   resolvers,
 })
 
